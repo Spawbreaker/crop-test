@@ -1,0 +1,11 @@
+.custom_cropper_class {
+  color: #61DAFB;
+  border: solid 1px #2b2a30;
+
+  display: grid;
+
+  width: 100%;
+  max-width: 1200px;
+  max-height: 800px;
+  position: relative;
+}

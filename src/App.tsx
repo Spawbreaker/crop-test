@@ -1,17 +1,15 @@
 import React, { useState } from "react";
-import { ReactCropper } from "./ReactCropper/ReactCropper";
-import { ReactImageCrop } from "./ReactImageCrop/ReactImageCrop";
-
+import { ReactAdvancedCropper } from "./ReactAdvancedCropper/ReactAdvancedCropper";
+import { ReactDropzone } from "./ReactDropzone";
 
 const App: React.FC = () => {
-  const [src, setSrc] = useState<string>(
-    "https://upload.wikimedia.org/wikipedia/commons/9/9e/Ours_brun_parcanimalierpyrenees_1.jpg"
-  );
+  const [image, setImage] = useState<string>();
 
   return (
     <div className="App">
       <h1>Hello!</h1>
-      <ReactImageCrop />
+      <ReactDropzone onImageUpload={setImage} />
+      <ReactAdvancedCropper image={image} />
     </div>
   );
 };
