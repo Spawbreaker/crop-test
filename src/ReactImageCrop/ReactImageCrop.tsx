@@ -5,7 +5,7 @@ import "react-image-crop/dist/ReactCrop.css";
 import { canvasPreview } from "./canvasPreview";
 import { ImageConfigurations, configurations, testImage, SelectConfiguration } from "../constants";
 
-const ReactCropper: React.FC = () => {
+export const ReactImageCrop: React.FC = () => {
   const [src, setSrc] = useState<string>(testImage);
   const [crop, setCrop] = useState<Crop>();
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
@@ -90,5 +90,3 @@ const ReactCropper: React.FC = () => {
     </div>
   );
 };
-
-export default ReactCropper;

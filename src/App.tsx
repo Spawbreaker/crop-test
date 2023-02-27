@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { ReactCropper } from "./ReactCropper/ReactCropper";
+import { ReactImageCrop } from "./ReactImageCrop/ReactImageCrop";
 
 
 const App: React.FC = () => {
@@ -10,7 +11,7 @@ const App: React.FC = () => {
   return (
     <div className="App">
       <h1>Hello!</h1>
-      <ReactCropper />
+      <ReactImageCrop />
     </div>
   );
 };
