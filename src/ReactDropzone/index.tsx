@@ -1,16 +1,29 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import styled from 'styled-components';
 
-const DropRectangle = styled.div`
+interface DropRectangleProps {
+  isCropped?: boolean;
+}
+
+const beforeCroppedGridTemplate = `
+  "image title file"
+  "image description file"
+  /50px 1fr auto
+`;
+
+const afterCroppedGridTemplate = `
+  "image title file"
+  /50px 1fr auto
+`;
+
+const DropRectangle = styled.div<DropRectangleProps>`
   border-style: dashed;
   border-radius: 0.25rem;
   border-color: white;
   border-width: 2px;
   display: grid;
-  grid-template: "image title file"
-                  "image description file"
-                  /50px 1fr auto;
+  grid-template: ${({ isCropped }) => isCropped ? afterCroppedGridTemplate : beforeCroppedGridTemplate};
   grid-gap: 0.25rem 0.5rem;
   padding: 0.5rem 1rem;
   margin-bottom: 1rem;
@@ -24,15 +37,62 @@ const DropRectangle = styled.div`
     border-color: #e0e0e0;
     background-color: #3f3f3f;
   }
+
+  & > img {
+    width: 50px;
+    height: 50px;
+  }
 `;
 
 interface Props {
   onImageUpload: (image: string) => void;
+  image?: string;
 }
 
-export const ReactDropzone: React.FC<Props> = ({ onImageUpload }) => {
+interface DropzoneBeforeUploadProps {
+  title: string;
+  acceptedFormats: string;
+  open: () => void;
+}
+
+const DropzoneBeforeUpload: React.FC<DropzoneBeforeUploadProps> = ({
+  title, acceptedFormats, open,
+}) => (
+  <>
+    <p style={{ gridArea: "image", margin: 'none', alignSelf: 'center' }}>{
+      <span>Image</span>
+    }</p>
+    <p style={{ gridArea: "title", margin: 'none', alignSelf: 'center' }}>
+      {title}
+    </p>
+    <p style={{ gridArea: "description", margin: 'none' }}>{acceptedFormats}</p>
+    <p style={{ gridArea: "file", cursor: 'pointer', alignSelf: 'center' }} className="button" onClick={open}>Choose file</p>
+  </>
+)
+
+interface DropzoneAfterUploadProps {
+  image: string;
+  name: string;
+}
+
+const DropzoneAfterUpload: React.FC<DropzoneAfterUploadProps> = ({ image, name }) => (
+  <>
+    <p style={{ gridArea: "image", margin: 'none', alignSelf: 'center' }}>
+      <img src={image} style={{ maxWidth: '50px', maxHeight: '50px' }} />
+    </p>
+    <p style={{ gridArea: "title", margin: 'none', alignSelf: 'center', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+      {name}
+    </p>
+    <p style={{ gridArea: "file", cursor: 'pointer', alignSelf: 'center' }} className="button">...</p>
+  </>
+)
+
+export const ReactDropzone: React.FC<Props> = ({ onImageUpload, image }) => {
+  const [uploadedImageName, setUploadedImageName] = useState('');
+
   const onDrop = useCallback((acceptedFiles: File[]) => {
     onImageUpload(URL.createObjectURL(acceptedFiles[0]));
+    setUploadedImageName(acceptedFiles[0].name);
   }, []);
 
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
@@ -47,12 +107,11 @@ export const ReactDropzone: React.FC<Props> = ({ onImageUpload }) => {
   });
 
   return (
-    <DropRectangle {...getRootProps()} >
+    <DropRectangle {...getRootProps()} isCropped={Boolean(image)}>
       <input {...getInputProps()} />
-      <p style={{ gridArea: "image", margin: 'none', alignSelf: 'center' }}>Image</p>
-      <p style={{ gridArea: "title", margin: 'none' }}>Drag & drop image here</p>
-      <p style={{ gridArea: "description", margin: 'none' }}>bmp, jpeg, png, wbmp, smb, webp</p>
-      <p style={{ gridArea: "file", cursor: 'pointer', alignSelf: 'center' }} className="button" onClick={open}>Choose file</p>
+      {
+        image ? <DropzoneAfterUpload image={image} name={uploadedImageName} /> : <DropzoneBeforeUpload title="Drag & drop image here" acceptedFormats="bmp, jpeg, jpg, png, webp, wbmp, smb" open={open} />
+      }
     </DropRectangle>
   )
 };
